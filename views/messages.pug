@@ -1,0 +1,41 @@
+extends ./main
+block variables
+    -let pageTitle = 'Chat'
+block linkCSS
+    link(rel='stylesheet', href='/css/style.css')
+block content
+    each friend in user.friends
+        if(friend.userId === friendId)
+            .container.d-flex
+                .w-25.m-3.border-end
+                    .position-sticky.top-0
+                        img.w-75.rounded-circle(src="/"+ friend.image style='width:15vw;height:15vw')
+                        h3= friend.name
+                        .status(class=friendId)
+                .w-75
+                    .messages.mt-5
+                        -if(messages?.length)
+                            form(action="/chats/deleteMsg" method="post")
+                                input(type="hidden" name="chatId" value=chatId)
+                                -let historyTemp ;
+                                each msg in messages
+                                    -if(historyTemp !== msg.timestamps.split(', ')[0])
+                                        p.w-25.rounded-pill.bg-secondary.text-white.ms-auto.me-auto.text-center(style='width:fit-content')= msg.timestamps.split(', ')[0]
+                                        -historyTemp = msg.timestamps.split(', ')[0]
+                                    -if(msg.sender === String(user._id))
+                                        .d-flex.justify-content-end
+                                            if(msg.content !== 'Deleted Message')
+                                                button.btn-close(type="submit" name="msgId" value=msg._id)
+                                                .msg-rigth.position-relative.pt-1.pb-1.ps-3.pe-3.bg-success.text-white.rounded-pill(style='width:fit-content;')= msg.content
+                                            else
+                                                .msg-rigth.position-relative.pt-1.pb-1.ps-3.pe-3.bg-success.rounded-pill(style='width:fit-content;')= msg.content
+                                        p.ms-auto(style='width:fit-content; font-size:2px')= msg.timestamps.split(', ')[1]
+                                    -else
+                                        if(msg.content !== 'Deleted Message')
+                                            .msg-left.position-relative.me-auto.pt-1.pb-1.ps-3.pe-3.bg-success.text-white.rounded-pill(style='width:fit-content;')= msg.content
+                                        else
+                                            .msg-left.position-relative.me-auto.pt-1.pb-1.ps-3.pe-3.bg-success.rounded-pill(style='width:fit-content;')= msg.content
+                                        p.me-auto(style='width:fit-content; font-size:2px')= msg.timestamps.split(', ')[1]
+                    .d-flex.position-sticky.bottom-0.mb-3
+                        textarea.form-control(rows='1' name='msg' placeholder='enter message')
+                        button.btn.btn-primary.ms-3(id='submitMsg') send

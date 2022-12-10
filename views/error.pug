@@ -1,0 +1,11 @@
+extends ./main
+block variables
+    -let pageTitle ='error'
+block content
+    h5.alert.alert-danger(style="color:red;text-align:center")
+        if(err.status === '404')
+            |Page not found !
+        else if err.status === '500'
+            =err.msg ? err.msg : 'Internal Server Error'
+        else
+            =err.status + "  " + err.msg 

@@ -1,0 +1,17 @@
+.messages .msg-left::after, .messages .msg-rigth::after{
+    content: "";
+    height: 0;
+    width: 0;
+    position: absolute;
+    border: 12px solid;
+}
+.messages .msg-left::after{
+    border-color: rgb(25 135 84) transparent transparent;
+    top: 0;
+    left: -10px;
+}
+.messages .msg-rigth::after{
+    border-color: rgb(25 135 84) transparent transparent rgb(25 135 84);
+    top: 0;
+    right: -10px;
+}

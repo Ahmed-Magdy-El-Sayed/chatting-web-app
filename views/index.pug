@@ -1,0 +1,95 @@
+extends ./main
+block variables
+    -let pageTitle = 'Home'
+block content
+    .container.mt-5
+        if(user)
+            if(info.hisAccount)
+                .d-flex.gap-3
+                    .left.w-25
+                        .mb-3.d-flex.justify-content-center
+                            img(class='rounded-circle' src='/'+user.image style='width:15vw;height:15vw')
+                        button.btn.btn-primary.w-100(type="button" data-bs-toggle="modal" data-bs-target=".modal") Edit Profile
+                        .modal.fade
+                            .modal-dialog.modal-dialog-centered.modal-dialog-scrollable
+                                    .modal-content
+                                        form(enctype='multipart/form-data' action='/change-profile' method='post')
+                                            .modal-header
+                                                h1.modal-title.fs-5 Eidt Profile
+                                                button.btn-close(type="button" data-bs-dismiss="modal" aria-label="Close")
+                                            .modal-body
+                                                -let friendsIds = user.friends.map(friend=>friend.userId)
+                                                -let friendsReqs = user.friendsReqs.map(req=>req.userId)
+                                                if(friendsIds.length)
+                                                    input(type='hidden' name='friendsIds' value=friendsIds)
+                                                if(friendsReqs.length)
+                                                    input(type='hidden' name='friendsReqsIds' value=friendsIds)
+                                                .input-group.mt-3.mb-3
+                                                    span.input-group-text Change Image
+                                                    input.form-control(type='file' name='img')
+                                                .input-group.mt-3.mb-3
+                                                    span.input-group-text Change Name
+                                                    input.form-control(type='text' name='name' placeholder=user.name)
+                                                .input-group.mt-3.mb-3
+                                                    span.input-group-text Change Password
+                                                    div.w-100
+                                                        input.form-control(type='password' name='oldPass' placeholder='Enter Old Password')
+                                                        input.form-control(type='password' name='newPass1' placeholder='Enter New Password')
+                                                        input.form-control(type='password' name='newPass2' placeholder='Enter New Password Again')
+                                                        p.d-none.alert.alert-danger The two fields of new password are not identical
+                                            .modal-footer
+                                                button.btn.btn-success(type="submit" disabled name='userId' value=user._id) Save
+                    div.right.w-75
+                        if(info.hasFriendReqsRcv)
+                            h4 Friend Requests Received
+                            each friendReq in user.friendsReqs
+                                if(friendReq.sender === 'him')
+                                    .d-flex.gap-3
+                                        div.left.w-25
+                                            img(class='rounded-circle' src='/'+friendReq.image style='width:15vw;height:15vw')
+                                        div.right.w-75
+                                            h3= friendReq.name
+                                            .position-relative
+                                                .position-absolute.end-0
+                                                    button(class='btn btn-success' id="accept_"+friendReq.userId value=friendReq) Accept
+                                                    button(class='btn btn-danger' id="reject_"+friendReq.userId value=friendReq ) Reject
+                        if(user.friends.length)
+                            h4 friends 
+                            each friend in user.friends
+                                -let ChatId ;
+                                -user.chats.map(chat=>{if(chat.friendId === friend.userId) ChatId = chat.chatId})
+                                .d-flex.gap-3
+                                    div.left.w-25
+                                        img(class='rounded-circle' src='/'+friend.image style='width:15vw;height:15vw')
+                                    div.right.w-75
+                                        a.text-decoration-none(href='/profile/'+friend.userId)
+                                            h3= friend.name
+                                        .status(class=friend.userId)
+                                        .position-relative
+                                            .position-absolute.end-0
+                                                button(class='btn btn-primary me-3' id='chat_'+friend.userId value= ChatId) Chat
+                                                button(class='btn btn-danger' id="unfriend_"+friend.userId value=friend) Unfriend
+            else
+                .d-flex.gap-3.mt-5
+                    div.left.w-25
+                        img(class='rounded-circle' src='/'+info.userProfile.image style='width:15vw;height:15vw')
+                    div.right.w-75
+                        .d-flex.justify-content-between
+                            div
+                                h3= info.userProfile.name
+                                .status(class= info.userProfile.userId)
+                            if(info.hisFriend)
+                                div
+                                    button(class='btn btn-primary me-3' id="chat_"+info.userProfile.userId value=info.userProfile.chatId) Chat
+                                    button(class='btn btn-danger' id="unfriend_"+info.userProfile.userId value=info.userProfile) Unfriend
+                            else if (info.friendReq)
+                                if(info.friendReq.sender === "me")
+                                    button(class='btn btn-danger' id="cancel-req_"+info.userProfile.userId value=info.userProfile ) Cancel Request
+                                else
+                                    button(class='btn btn-success me-3' id="accept_"+info.userProfile.userId value=info.userProfile) Accept
+                                    button(class='btn btn-danger' id="reject_"+info.userProfile.userId value=info.userProfile ) Reject
+                            else
+                                button(class='btn btn-primary' id="add-friend_"+info.userProfile.userId value=info.userProfile) Add Friend
+        else 
+            h3.alert.alert-warning create account or login if you have account
+

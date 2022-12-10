@@ -1,0 +1,85 @@
+- let links = [{title:'Home', href:'/'}, {title:'Login', href:'/login'}, {title:'Sign Up', href:'/signup'} ]
+block variables
+doctype html
+html
+    head
+        meta(charset='UTF-8')
+        meta(http-equiv='X-UA Compatible', content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1.0')
+        title= pageTitle
+        link(rel='stylesheet', href='/css/bootstrap.min.css')
+        block linkCSS
+    body(style='box-sizing:border-box; height:100vh')
+        if(user)
+            input(type='hidden' value={_id:user._id, name:user.name, image: user.image}).me
+        nav(class="navbar navbar-dark navbar-expand-md bg-dark")
+            .container-fluid
+                if(user)
+                    a.d-flex.align-items-center.text-decoration-none(href='/profile/'+user._id)
+                        img(src = "/"+user.image style='width:50px; height:50px').rounded-circle
+                        p.ms-3.mb-0.text-white= user.name
+                else
+                    a(class="navbar-brand" href="/") Chat App
+                button(class="navbar-toggler text-dark border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation")
+                    span(class='navbar-toggler-icon')
+                div(class="collapse navbar-collapse" id="navbarSupportedContent")
+                    ul(class="navbar-nav ms-auto me-auto")
+                        each link in links
+                            if((link.title === 'Sign Up' || link.title === 'Login') && user) 
+                            else
+                                li(class="nav-item")
+                                    a(class=`nav-link ps-0 pe-lg-3 ${link.title === pageTitle? 'active' : ''}` href = link.href)= link.title
+                    form(class="d-flex justify-content-end" action='/' method='get' role="search")
+                        <div class="btn-group search-users">
+                            input(class="form-control me-2 dropdown-toggle" data-bs-toggle="dropdown" type="search" name='search' placeholder="Search" aria-label="Search")
+                            <ul class="w-100 dropdown-menu">
+                                <li><a class="dropdown-item" href="#">Loading ...</a></li>
+                            </ul>
+                        </div>    
+                        
+                        button(class="btn btn-outline-primary" type="submit") Search
+                    if (isLoggedIn)
+                        a(class="btn btn-outline-danger ms-2" href='/logout') Logout
+        block content
+        -if(user?.notifications.length)
+            .toast-container
+                each notify in user.notifications
+                    if(notify.Ntype === 'friendReqNotify')
+                        .toast.show(role="alert")
+                            -let friend = JSON.parse(notify.msg);
+                            .toast-header
+                                img.w-25.rounded-circle.me-2(src='/'+friend.image)
+                                strong.me-auto=friend.name
+                                small.text-muted= notify.timestamps
+                                button.btn-close(type="button" data-bs-dismiss="toast" aria-label="Close")
+                            .toast-body.d-flex.justify-content-between
+                                p accept friend request?
+                                div
+                                    button(class='btn btn-success' id="accept_"+friend._id value=friend) Accept
+                                    button(class='btn btn-danger' id="reject_"+friend._id value=friend ) Reject
+                    else if(notify.Ntype === 'newMsg')
+                        .toast.show(role="alert" style='cursor:pointer' onclick="goToChat('"+user.chats.map(chat=>{if(chat.friendId===String(notify.sender._id))return chat.chatId})[0]+"')")
+                            .toast-header
+                                img.me-3.rounded-circle(src='/'+notify.sender.image style='width:50px; height:50px')
+                                strong.me-auto= `New Message from ${notify.sender.name}`
+                                small.text-muted= notify.timestamps
+                                button.btn-close(type="button" data-bs-dismiss="toast" aria-label="Close")
+                            .toast-body(style='text-overflow: ellipsis')
+                                =notify.msg
+                    else
+                        .toast.show(role="alert")
+                            .toast-header
+                                strong.me-auto New Notification
+                                small.text-muted= notify.timestamps
+                                button.btn-close(type="button" data-bs-dismiss="toast" aria-label="Close")
+                            .toast-body 
+                                p=notify.msg
+        -else
+            .toast-container
+                
+        script(src='/js/bootstrap.bundle.min.js')
+        if(user)
+            script(src='/socket.io/socket.io.js')
+            script(src='/js/socket.init.js')
+        
+        block js
