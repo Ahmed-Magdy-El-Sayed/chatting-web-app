@@ -127,11 +127,6 @@ document.querySelector('input[name="search"]').onkeyup= e=>{
     assignUsersToDOM(e, filteredUsers);
 }
 
-document.querySelector('.modal-header .btn-close').onclick=()=>{
-    document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
-    document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
-}
-
 let changeProfileFun = e=>{
     if(e.target.value) document.querySelector('.modal-footer .btn').removeAttribute('disabled')
     else{
@@ -193,6 +188,11 @@ document.addEventListener('click', e=>{
         if(e.target.parentElement.className === 'modal-footer')
             e.target.parentElement.parentElement.submit
     }
+    if(document.querySelector('.modal-header .btn-close') === e.target){
+    document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
+    document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
+}
+
     if(e.target.id.split('_')[0] === 'chat'){
         friendId = e.target.id.split("_")[1];
         location.assign('/chats/' + document.getElementById('chat_'+friendId).value);
