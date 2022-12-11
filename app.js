@@ -14,10 +14,12 @@ import {
     storeNewMsgNotify
 } from './controllers/user.js'
 import {storeMsg} from './controllers/root.js';
+import mongoose from 'mongoose';
+mongoose.set('strictQuery', false);
 
 const MongoDBStore = connectMongoDBSession(session)
 const STRORE = new MongoDBStore({
-    uri:"mongodb://localhost:27017/Chatting-App",
+    uri:"mongodb+srv://AhmedMagdy:SkZd25etQDLEEBLB@cluster0.kbcoecs.mongodb.net/chatting-web?retryWrites=true&w=majority",
     collection:'sessions'
 })
 
@@ -81,7 +83,7 @@ io.on('connection', socket=>{
             io.onlineUsers[receiverId]?
                 io.to(receiverId).emit("receiveMsg", sender, res.msg, res.chatId)
                 :
-                storeNewMsgNotify(sender, receiverId, msg).catch(err=>{console.log(err)});
+                storeNewMsgNotify(sender, receiverId, msg).catch(()=>{});
             io.to(sender._id).emit("receiveMsg", null, res.msg, res.chatId)
         }).catch(err=>{
             io.to(sender._id).emit('notify',err)
@@ -94,7 +96,7 @@ app.use('/',rootRouter)
 app.use((err, req, res, next)=>{
     if(err.status === '404') res.status(404).render("error",{user:res.session?.user, err:'404'})
     else if(err.status === '500') res.status(500).render("error",{user:res.session?.user, err:{status:'500', msg: err.msg? err.msg : 'Internal server error'}})
-    else {console.log(err)
+    else {
         res.status(isNaN(parseInt(err.status)) ? 500 : parseInt(err.status)).render("error",{user:res.session?.user, err:{...err}})
     }
 })

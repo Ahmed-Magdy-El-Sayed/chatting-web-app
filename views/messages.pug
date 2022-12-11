@@ -14,8 +14,8 @@ block content
                         .status(class=friendId)
                 .w-75
                     .messages.mt-5
-                        -if(messages?.length)
-                            form(action="/chats/deleteMsg" method="post")
+                        form(action="/chats/deleteMsg" method="post")
+                            -if(messages?.length)
                                 input(type="hidden" name="chatId" value=chatId)
                                 -let historyTemp ;
                                 each msg in messages

@@ -7,7 +7,7 @@ block content
         form(class='login w-100 text-center needs-validation mt-5' action="/login" method='post')
             input(class='form-control' type='email' name='email' placeholder='enter your e-mail' required)
             input(class='form-control mt-3' type='password' name='password' placeholder='enter password' required)
-            button(class="btn btn-primary mt-3 mb-3" type='submit' ) submit
+            button(class="btn btn-primary mt-3 mb-3" type='submit' ) Submit
         .text-center
             span.text-center do not have account ?
             | 
@@ -15,8 +15,4 @@ block content
             if(error)
                 p(class="alert alert-danger mt-3")= error
     block js
-    script
-        .
-            document.querySelector('.login .btn').onclick=()=>{
-                document.querySelector('.login').classList.add('was-validated');
-            }
+    script(src='/js/login.js')

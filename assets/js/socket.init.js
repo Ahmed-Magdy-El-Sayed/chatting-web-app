@@ -29,7 +29,7 @@ const goToChat=async chatId =>{
 socket.on('receiveMsg',(sender, msg, chatId)=>{
     if(sender){
         location.href.split('/').includes(chatId) ?
-        document.querySelector(".messages").innerHTML+=`
+        document.querySelector(".messages form").innerHTML+=`
         <div class='msg-left position-relative pt-1 pb-1 ps-3 pe-3 bg-success ${msg.content==='Deleted Message'?"":`text-white`} rounded-pill' style="width:fit-content;">
             ${msg.content}
         </div>
@@ -127,6 +127,11 @@ document.querySelector('input[name="search"]').onkeyup= e=>{
     assignUsersToDOM(e, filteredUsers);
 }
 
+document.querySelector('.modal-header .btn-close').onclick=()=>{
+    document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
+    document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
+}
+
 let changeProfileFun = e=>{
     if(e.target.value) document.querySelector('.modal-footer .btn').removeAttribute('disabled')
     else{
@@ -154,6 +159,7 @@ if(document.querySelector('.modal')){
     
     changePassInputs?.forEach(input=>{
         input.onkeyup= e=>{
+            e.target.innerHTML = `Save`
             changeProfileFun(e)
             if(e.target.value){
                 e.target.hasAttribute('required')? '' :
@@ -172,6 +178,7 @@ if(document.querySelector('.modal')){
             }else{
                 e.target.hasAttribute('required')? changePassInputs.forEach(input=>{input.removeAttribute('required')}) : '';
             }
+            
         }
     })
 }
@@ -179,6 +186,13 @@ if(document.querySelector('.modal')){
 let fristTimeOnly = true;
 document.addEventListener('click', e=>{
     let friendId ;
+    if(e.target.classList.contains('btn')){
+        if(e.target.parentElement.className !== 'modal-footer')
+            e.target.setAttribute('disabled',null);
+        e.target.innerHTML += `<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>`
+        if(e.target.parentElement.className === 'modal-footer')
+            e.target.parentElement.parentElement.submit
+    }
     if(e.target.id.split('_')[0] === 'chat'){
         friendId = e.target.id.split("_")[1];
         location.assign('/chats/' + document.getElementById('chat_'+friendId).value);
@@ -227,12 +241,12 @@ let editPage = (type, sender, id)=>{
             if(sender === 'me'){
                 btn= document.getElementById('add-friend_'+id);
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-danger' id='cancel-req_${id}' value=${btn.value}> Cancel Request </button>`;
+                `<button class='btn btn-danger h-100' id='cancel-req_${id}' value=${btn.value}> Cancel Request </button>`;
             }else{
                 btn= document.getElementById('add-friend_'+id);
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-success' id='accept_${id}' value=${btn.value}> Accept </button>
-                <button class='btn btn-danger' id='reject_${id}' value=${btn.value}> Reject </button>`;
+                `<button class='btn btn-success h-100' id='accept_${id}' value=${btn.value}> Accept </button>
+                <button class='btn btn-danger h-100' id='reject_${id}' value=${btn.value}> Reject </button>`;
             }
             document.getElementById('add-friend_'+id)?.remove();
             break;
@@ -241,13 +255,13 @@ let editPage = (type, sender, id)=>{
                 btn = document.getElementById('cancel-req_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
+                `<button class='btn btn-primary h-100' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
                 document.getElementById('cancel-req_'+id)?.remove();
             }else{
                 btn = document.getElementById('accept_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
+                `<button class='btn btn-primary h-100' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
                 document.getElementById('accept_'+id)?.remove()
                 document.getElementById('reject_'+id)?.remove();
             }
@@ -257,7 +271,7 @@ let editPage = (type, sender, id)=>{
                 btn = document.getElementById('reject_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
+                `<button class='btn btn-primary h-100' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
                 document.getElementById('reject_'+id)?.remove();
                 document.getElementById('accept_'+id)?.remove()
             }
@@ -265,7 +279,7 @@ let editPage = (type, sender, id)=>{
                 btn = document.getElementById('cancel-req_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
+                `<button class='btn btn-primary h-100' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
                 document.getElementById('cancel-req_'+id)?.remove();
             }
             break;
@@ -274,8 +288,8 @@ let editPage = (type, sender, id)=>{
                 btn = document.getElementById('accept_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary me-3' id="chat_${id}" value=${btn.value}> Chat </button>
-                <button class='btn btn-danger' id="unfriend_${id}" value=${btn.value}> Unfriend </button>
+                `<button class='btn btn-primary h-100 me-3' id="chat_${id}" value=${btn.value}> Chat </button>
+                <button class='btn btn-danger h-100' id="unfriend_${id}" value=${btn.value}> Unfriend </button>
                 `
                 document.getElementById('accept_'+id)?.remove()
                 document.getElementById('reject_'+id)?.remove();
@@ -284,8 +298,8 @@ let editPage = (type, sender, id)=>{
                 btn = document.getElementById('cancel-req_'+id);
                 
                 btn.parentElement.innerHTML += 
-                `<button class='btn btn-primary me-3' id="chat_${id}" value=${btn.value}> Chat </button>
-                <button class='btn btn-danger' id="unfriend_${id}" value=${btn.value}> Unfriend </button>
+                `<button class='btn btn-primary me-3 h-100' id="chat_${id}" value=${btn.value}> Chat </button>
+                <button class='btn btn-danger h-100' id="unfriend_${id}" value=${btn.value}> Unfriend </button>
                 `
                 document.getElementById('cancel-req_'+id)?.remove()
             }
@@ -294,7 +308,7 @@ let editPage = (type, sender, id)=>{
             btn = document.getElementById('unfriend_'+id);
             
             btn.parentElement.innerHTML += 
-            `<button class='btn btn-primary' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
+            `<button class='btn btn-primary h-100' id="add-friend_${id}" value=${btn.value}> Add Friend </button>`
             document.getElementById('unfriend_'+id)?.remove();
             document.getElementById('chat_'+id)?.remove();
             break;
@@ -341,7 +355,7 @@ socket.on('notify', msg=>{
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
-            ${typeof msg === String? msg : "something went wrong"}
+            ${typeof msg === "string"? msg : "something went wrong"}
         </div>
     </div>
     `

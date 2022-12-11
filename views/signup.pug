@@ -18,8 +18,4 @@ block content
             | 
             a(href='/login') Login
 block js
-    script
-        .
-            document.querySelector('.signup .btn').onclick=()=>{
-                document.querySelector('.signup').classList.add('was-validated');
-            }
+    script(src='/js/signup.js')

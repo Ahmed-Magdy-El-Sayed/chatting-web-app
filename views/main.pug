@@ -1,4 +1,4 @@
-- let links = [{title:'Home', href:'/'}, {title:'Login', href:'/login'}, {title:'Sign Up', href:'/signup'} ]
+- let links = [{title:'Home', href:user?'/profile/'+user._id:'/'}, {title:'Login', href:'/login'}, {title:'Sign Up', href:'/signup'} ]
 block variables
 doctype html
 html
@@ -29,15 +29,12 @@ html
                             else
                                 li(class="nav-item")
                                     a(class=`nav-link ps-0 pe-lg-3 ${link.title === pageTitle? 'active' : ''}` href = link.href)= link.title
-                    form(class="d-flex justify-content-end" action='/' method='get' role="search")
-                        <div class="btn-group search-users">
+                    .d-flex.justify-content-end
+                        .btn-group.search-users
                             input(class="form-control me-2 dropdown-toggle" data-bs-toggle="dropdown" type="search" name='search' placeholder="Search" aria-label="Search")
-                            <ul class="w-100 dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Loading ...</a></li>
-                            </ul>
-                        </div>    
-                        
-                        button(class="btn btn-outline-primary" type="submit") Search
+                            ul.w-100.dropdown-menu
+                                li
+                                    a.dropdown-item(href="#") Loading ...
                     if (isLoggedIn)
                         a(class="btn btn-outline-danger ms-2" href='/logout') Logout
         block content

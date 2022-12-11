@@ -40,19 +40,21 @@ block content
                                             .modal-footer
                                                 button.btn.btn-success(type="submit" disabled name='userId' value=user._id) Save
                     div.right.w-75
-                        if(info.hasFriendReqsRcv)
-                            h4 Friend Requests Received
+                        if(user.friendsReqs.length)
+                            h4 Friend Requests
                             each friendReq in user.friendsReqs
-                                if(friendReq.sender === 'him')
-                                    .d-flex.gap-3
-                                        div.left.w-25
-                                            img(class='rounded-circle' src='/'+friendReq.image style='width:15vw;height:15vw')
-                                        div.right.w-75
-                                            h3= friendReq.name
-                                            .position-relative
-                                                .position-absolute.end-0
-                                                    button(class='btn btn-success' id="accept_"+friendReq.userId value=friendReq) Accept
-                                                    button(class='btn btn-danger' id="reject_"+friendReq.userId value=friendReq ) Reject
+                                .d-flex.gap-3
+                                    div.left.w-25
+                                        img(class='rounded-circle' src='/'+friendReq.image style='width:15vw;height:15vw')
+                                    div.right.w-75
+                                        h3= friendReq.name
+                                        .position-relative
+                                            .position-absolute.end-0
+                                                if(friendReq.sender === 'him')
+                                                    button.h-100(class='btn btn-success' id="accept_"+friendReq.userId value=friendReq) Accept
+                                                    button.h-100(class='btn btn-danger' id="reject_"+friendReq.userId value=friendReq ) Reject
+                                                else
+                                                    button.h-100(class='btn btn-danger' id="cancel-req_"+friendReq.userId value=friendReq ) Cancel Request
                         if(user.friends.length)
                             h4 friends 
                             each friend in user.friends
@@ -67,8 +69,8 @@ block content
                                         .status(class=friend.userId)
                                         .position-relative
                                             .position-absolute.end-0
-                                                button(class='btn btn-primary me-3' id='chat_'+friend.userId value= ChatId) Chat
-                                                button(class='btn btn-danger' id="unfriend_"+friend.userId value=friend) Unfriend
+                                                button.h-100(class='btn btn-primary me-3' id='chat_'+friend.userId value= ChatId) Chat
+                                                button.h-100(class='btn btn-danger' id="unfriend_"+friend.userId value=friend) Unfriend
             else
                 .d-flex.gap-3.mt-5
                     div.left.w-25
@@ -86,8 +88,9 @@ block content
                                 if(info.friendReq.sender === "me")
                                     button(class='btn btn-danger' id="cancel-req_"+info.userProfile.userId value=info.userProfile ) Cancel Request
                                 else
-                                    button(class='btn btn-success me-3' id="accept_"+info.userProfile.userId value=info.userProfile) Accept
-                                    button(class='btn btn-danger' id="reject_"+info.userProfile.userId value=info.userProfile ) Reject
+                                    div
+                                        button(class='btn btn-success me-3' id="accept_"+info.userProfile.userId value=info.userProfile) Accept
+                                        button(class='btn btn-danger' id="reject_"+info.userProfile.userId value=info.userProfile ) Reject
                             else
                                 button(class='btn btn-primary' id="add-friend_"+info.userProfile.userId value=info.userProfile) Add Friend
         else 

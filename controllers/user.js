@@ -24,9 +24,9 @@ export const pullReq = (io, friendObj, me) =>{
     const friend = JSON.parse(friendObj);
     const friendId = friend.userId? friend.userId : friend._id
     deleteReq({friendId, myId:me._id}).then(()=>{
-        io.to(me._id).emit('sessionEdit',{type:'deleteReq',value:{userId:friendId}})
+        io.to(me._id).emit('sessionEdit',{type:'deleteReq',value:{userId:friendId, sender:'me'}})
         
-        if(io.onlineUsers[friendId]) io.to(friendId).emit('sessionEdit',{type:'deleteReq',value:{userId:me._id}});
+        if(io.onlineUsers[friendId]) io.to(friendId).emit('sessionEdit',{type:'deleteReq',value:{userId:me._id, sender:'him'}});
 
         io.to(me._id).emit('notify','request canceled successfully')
     }).catch(()=>{
@@ -92,7 +92,5 @@ export const remove = (io, friendObj, me) =>{
 }
 
 export const storeNewMsgNotify =async (sender, receiverId, msg)=>{
-    storeMsgNotify(sender, receiverId, msg).catch(err=>{
-        console.log(err)
-    })
+    storeMsgNotify(sender, receiverId, msg).catch(()=>{})
 }

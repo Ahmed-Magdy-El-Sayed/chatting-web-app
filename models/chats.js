@@ -101,8 +101,7 @@ export const deleteMsgdb = data=>{
         return dbConnect(async ()=>{
             return await messages.updateOne({_id:data.chatId,'messages._id': data.msgId},
                 {$set:{'messages.$.content': 'Deleted Message'}
-            }).catch((err)=>{
-                console.log(err)
+            }).catch(()=>{
                 throw null
             })
         })

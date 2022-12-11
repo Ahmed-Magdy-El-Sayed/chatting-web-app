@@ -45,13 +45,6 @@ const userProfile =async (req, res, next)=>{
                 return req.params.id === friendReq.userId
             });
         }
-    }else{
-        info.hasFriendReqsRcv = req.session.user.friendsReqs.map(friendReq=>{
-            return friendReq.sender === 'him';
-        }).includes(true)
-        info.hasFriendReqsSent = req.session.user.friendsReqs.map(friendReq=>{
-            return friendReq.sender === 'me';
-        }).includes(true)
     }
     res.render('index',{
         user: req.session.user,
@@ -64,33 +57,32 @@ const sessionUpdate =(req,res)=>{
     const value = req.body.value;
     if(type === 'sendReq' || type === 'receiveReq'){
         req.session.user.friendsReqs.push(value);
-        req.session.save(()=>{req.session.reload(()=>{})})
+        req.session.save(()=>{res.sendStatus(200)})
     }else if(type === 'deleteReq' || type === 'rejectReq'){
         req.session.user.friendsReqs = req.session.user.friendsReqs.filter(freq=>{
             return String(freq.userId) !== String(value.userId)
         })
-        req.session.save(()=>{req.session.reload(()=>{})})
+        req.session.save(()=>{res.sendStatus(200)})
     }else if(type === 'acceptReq'){
         req.session.user.friendsReqs = req.session.user.friendsReqs.filter(freq=>{
             return String(freq.userId) !== String(value.userId)
         })
+        req.session.save(()=>{})
         req.session.user.friends.push(value);
-        req.session.save(()=>{req.session.reload(()=>{})})
+        req.session.save(()=>{res.sendStatus(200)})
     }else if(type === 'unfriend'){
         req.session.user.friends = req.session.user.friends.filter(friend=>{
             return String(friend.userId) !== String(value.userId)
         })
-        req.session.save(()=>{req.session.reload(()=>{})})
+        req.session.save(()=>{res.sendStatus(200)})
     }else if (type === 'addChatId') {
         req.session.user.chats.push({
             friendId:req.body.friendId,
             chatId:req.body.chatId
         })
-        req.session.save(()=>{req.session.reload(()=>{})})
+        req.session.save(()=>{res.sendStatus(200)})
     }
     else return res.sendStatus(500);
-    res.sendStatus(200)
-    
 }
 
 // function for signup page
@@ -183,9 +175,7 @@ const changeProfile = (req, res, next)=>{
     updateProfile({filename:req.file?.filename,...req.body}).then(values=>{
         if(values && Object.keys(values).length) req.session.user = {...req.session.user, ...values};
         req.session.save(()=>{
-            req.session.reload(()=>{
-                res.redirect(302,'/')
-            })
+            res.redirect(302,'/')
         })
     }).catch(err=>{
         err? next({status:401, msg:err}) : next({status:500});

@@ -144,7 +144,6 @@ export const updateProfile = data=>{
             let isErr = false;
             let error = false;
             if(data.name){
-                console.log(data.friendsIds)
                 await usersModel.updateOne(
                     {_id:data.userId},
                     {$set:{name:data.name}}
@@ -225,7 +224,6 @@ export const updateProfile = data=>{
                     isErr = true;
                     error = err
                 })}
-            console.log(error)
             if(isErr) throw error  ? error : null;
             else return Object.keys(changed).length? changed : null;
             })
