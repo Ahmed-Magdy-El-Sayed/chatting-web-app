@@ -191,7 +191,7 @@ document.addEventListener('click', e=>{
     if(document.querySelector('.modal-header .btn-close') === e.target){
     document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
     document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
-}
+    }
 
     if(e.target.id.split('_')[0] === 'chat'){
         friendId = e.target.id.split("_")[1];
@@ -200,7 +200,9 @@ document.addEventListener('click', e=>{
         friendId = document.querySelector('.status').classList[1];
         let msg = document.querySelector('textarea[name="msg"]').value;
         document.querySelector('textarea[name="msg"]').value = '';
-
+        e.target.innerHTML = "Submit";
+        e.target.removeAttribute('disabled');
+        
         socket.emit('sendMsg', me, friendId, msg)
 
         document.querySelector(".messages form").innerHTML+=`
