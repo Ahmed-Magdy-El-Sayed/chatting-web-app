@@ -131,6 +131,11 @@ document.addEventListener('click', e=>{
         document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
         document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
     }
+    if(document.querySelector('.modal-header .btn-close') === e.target){
+    document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
+    document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
+    }
+
     if(e.target.id.split('_')[0] === 'chat'){
         friendId = e.target.id.split("_")[1];
         location.assign('/chats/' + document.getElementById('chat_'+friendId).value);
