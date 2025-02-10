@@ -34,7 +34,7 @@ export const pullReq = (io, friendObj, me) =>{
     })
 }
 
-export const acceptReq =async (io, friendObj, me) =>{
+export const acceptReq = async (io, friendObj, me) =>{
     const friend = JSON.parse(friendObj);
     const friendId = friend.userId? friend.userId : friend._id
     await addFriend({

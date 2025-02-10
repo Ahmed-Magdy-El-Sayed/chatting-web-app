@@ -263,9 +263,17 @@ export const deleteReq = data =>{
     try{    
         return dbConnect(async()=>{
             let isErr= false;
-            await usersModel.updateOne({_id:data.friendId},{$pull:{friendsReqs:{
-                userId:data.myId
-            }}}).catch(()=>{
+            await usersModel.findOneAndUpdate({_id:data.friendId},{$pull:{
+                friendsReqs:{
+                    userId:data.myId
+                }}
+            }, {new: true}
+            ).then(async friend=>{
+                const notifications = friend.notifications.filter(notify=>
+                    notify.Ntype !== "friendReqNotify" ||  (notify.Ntype === "friendReqNotify" && JSON.parse(notify.msg)._id !== data.myId)
+                )
+                await usersModel.updateOne({_id:data.friendId},{$set:{notifications}})
+            }).catch(()=>{
                 isErr = true;
             })
             await usersModel.updateOne({_id:data.myId},{$pull:{friendsReqs:{
@@ -286,7 +294,7 @@ export const addFriend = data =>{
         return dbConnect(async()=>{
             let value;
             let isErr= false;
-            await usersModel.updateOne({_id:data.friendId},
+            /* await usersModel.updateOne({_id:data.friendId},
                 {
                     $push:{friends:{
                         userId:data.myId,
@@ -313,13 +321,36 @@ export const addFriend = data =>{
                 }
             ).catch(()=>{
                 isErr = true;
-            })
+            }) */
             await createMessagesDoc(data.myId, data.friendId).then(async chatId=>{
-                await usersModel.updateOne({_id:data.myId}, {$push:{chats:{friendId: data.friendId, chatId} }})
-                .catch(()=>{
+                await usersModel.updateOne({_id:data.myId}, {
+                    $pull:{friendsReqs:{
+                        userId:data.friendId
+                    }},
+                    $push:{
+                        friends:{
+                            userId:data.friendId,
+                            name:data.friendName,
+                            image:data.friendImg
+                        }, 
+                        chats:{friendId: data.friendId, chatId} 
+                    }
+                }).catch(()=>{
                     isErr = true;
                 });
-                await usersModel.updateOne({_id:data.friendId}, {$push:{chats:{friendId: data.myId, chatId} }})
+                await usersModel.updateOne({_id:data.friendId}, {
+                    $pull:{friendsReqs:{
+                        userId:data.myId
+                    }},
+                    $push:{
+                        friends:{
+                            userId:data.myId,
+                            name:data.myName,
+                            image:data.myImg
+                        },
+                        chats:{friendId: data.myId, chatId}
+                    }
+                })
                 .catch(()=>{
                     isErr = true;
                 });

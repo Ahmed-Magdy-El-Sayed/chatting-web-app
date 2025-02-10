@@ -1,7 +1,3 @@
-let socket = io();
-
-const me = JSON.parse(document.querySelector('.me').value)
-
 socket.on('connect',()=>{
     socket.emit('makeRoom',me._id)
     socket.emit('makeOnline',me._id)
@@ -70,68 +66,6 @@ socket.on('receiveMsg',(sender, msg, chatId)=>{
     }
 })
 
-const assignUsersToDOM =(e, users)=>{
-    e.target.nextSibling.innerHTML = null;
-    if(users === 'Internal Server Error')
-        e.target.nextSibling.innerHTML = `
-        <li>
-            <a class='dropdown-item d-flex' href= ''>
-                ${users}
-            </a>
-        </li>
-        `;
-    else if(!users.length) 
-        e.target.nextSibling.innerHTML = `
-        <li>
-            <a class='dropdown-item d-flex' href= ''>
-                No users
-            </a>
-        </li>
-        `;
-    else
-        users.forEach(user => {
-            if(user._id !== me._id) 
-                e.target.nextSibling.innerHTML += `
-                <li>
-                    <a class='dropdown-item d-flex align-items-center' href= '/profile/${user._id}'>
-                        <img class='rounded-circle me-3' src='/${user.image}' style='width:50px; height:50px'>
-                        <h5>${user.name}</h5>
-                        <div class='status ${user._id} ms-auto'></div>
-                    </a>
-                </li>
-                `
-                socket.emit('refrechOnlines')
-        });
-}
-let users = [];
-document.querySelector('input[name="search"]').onfocus=async e=>{
-    if(!users.length){
-        users = await fetch("/getUsers")
-        .then(res=>res.json())
-        .then(res=>JSON.parse(res))
-        .catch(()=>'Internal Server Error')
-        assignUsersToDOM(e, users);
-    }
-}
-let filteredUsers = [];
-document.querySelector('input[name="search"]').onkeyup= e=>{
-    e.target.value.split(' ').forEach(word=>{
-        filteredUsers = users.filter(user=>{
-            let userName = user.name.split('');
-            return word.split('').map((char, i)=> {
-                if(char.toLowerCase() !== userName[i]?.toLowerCase())
-                    return false;
-            }).includes(false)?false:true;
-        })
-    })
-    assignUsersToDOM(e, filteredUsers);
-}
-
-document.querySelector('.modal-header .btn-close').onclick=()=>{
-    document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
-    document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
-}
-
 let changeProfileFun = e=>{
     if(e.target.value) document.querySelector('.modal-footer .btn').removeAttribute('disabled')
     else{
@@ -189,9 +123,13 @@ document.addEventListener('click', e=>{
     if(e.target.classList.contains('btn')){
         if(e.target.parentElement.className !== 'modal-footer')
             e.target.setAttribute('disabled',null);
-        e.target.innerHTML += `<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>`
         if(e.target.parentElement.className === 'modal-footer')
             e.target.parentElement.parentElement.submit
+        e.target.innerHTML += `<span class="spinner-border spinner-border-sm ms-2" role="status" aria-hidden="true"></span>`
+    }
+    if(document.querySelector('.modal-header .btn-close') === e.target){
+        document.querySelector('.btn[data-bs-toggle="modal"]').removeAttribute('disabled')
+        document.querySelector('.btn[data-bs-toggle="modal"]').innerHTML = 'Edit Profile'
     }
     if(e.target.id.split('_')[0] === 'chat'){
         friendId = e.target.id.split("_")[1];
@@ -200,6 +138,8 @@ document.addEventListener('click', e=>{
         friendId = document.querySelector('.status').classList[1];
         let msg = document.querySelector('textarea[name="msg"]').value;
         document.querySelector('textarea[name="msg"]').value = '';
+        e.target.removeAttribute('disabled');
+        e.target.innerHTML = "Submit"
 
         socket.emit('sendMsg', me, friendId, msg)
 
@@ -211,6 +151,7 @@ document.addEventListener('click', e=>{
     }
     else if(fristTimeOnly && e.target.parentElement.className === 'toast-header' && e.target.parentElement.querySelector('small').innerText !== 'just now' ){
         fristTimeOnly = false;
+        console.log("work")
         fetch('/removeNotificatons').catch(()=>{console.error('internal server error')});
     }
     else
@@ -220,7 +161,7 @@ document.addEventListener('click', e=>{
 socket.on('messagesId',async (friendId, chatId)=>{
     setTimeout(() => {
         document.getElementById('chat_'+friendId).value = chatId;
-    },200)
+    },400)
 
     fetch('/sessionUpdate',{
         method:'post',

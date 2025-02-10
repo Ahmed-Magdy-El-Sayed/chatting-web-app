@@ -19,7 +19,7 @@ mongoose.set('strictQuery', false);
 
 const MongoDBStore = connectMongoDBSession(session)
 const STRORE = new MongoDBStore({
-    uri:"mongodb+srv://AhmedMagdy:SkZd25etQDLEEBLB@cluster0.kbcoecs.mongodb.net/chatting-web?retryWrites=true&w=majority",
+    uri:"mongodb+srv://AhmedMagdy:1YLcRgPR4L0fPQzW@cluster0.kbcoecs.mongodb.net/chatting-web?retryWrites=true&w=majority",
     collection:'sessions'
 })
 

@@ -75,8 +75,69 @@ html
             .toast-container
                 
         script(src='/js/bootstrap.bundle.min.js')
+        script(src='/socket.io/socket.io.js')
+        script.
+            let socket = io();
+            const meJSON = document.querySelector('.me')?.value
+            const me = meJSON ? JSON.parse(meJSON) : null
+        script.
+            const assignUsersToDOM =(e, users)=>{
+                e.target.nextSibling.innerHTML = null;
+                if(users === 'Internal Server Error')
+                    e.target.nextSibling.innerHTML = `
+                    <li>
+                        <a class='dropdown-item d-flex' href= ''>
+                            ${users}
+                        </a>
+                    </li>
+                    `;
+                else if(!users.length) 
+                    e.target.nextSibling.innerHTML = `
+                    <li>
+                        <a class='dropdown-item d-flex' href= ''>
+                            No users
+                        </a>
+                    </li>
+                    `;
+                else
+                    users.forEach(user => {
+                        if(!me || user._id !== me._id) 
+                            e.target.nextSibling.innerHTML += `
+                            <li>
+                                <a class='dropdown-item d-flex align-items-center' href= '/profile/${user._id}'>
+                                    <img class='rounded-circle me-3' src='/${user.image}' style='width:50px; height:50px'>
+                                    <h5>${user.name}</h5>
+                                    <div class='status ${user._id} ms-auto'></div>
+                                </a>
+                            </li>
+                            `
+                            socket.emit('refrechOnlines')
+                    });
+            }
+            let users = [];
+            document.querySelector('input[name="search"]').onfocus=async e=>{
+                if(!users.length){
+                    users = await fetch("/getUsers")
+                    .then(res=>res.json())
+                    .then(res=>JSON.parse(res))
+                    .catch(()=>'Internal Server Error')
+                    assignUsersToDOM(e, users);
+                }
+            }
+            let filteredUsers = [];
+            document.querySelector('input[name="search"]').onkeyup= e=>{
+                e.target.value.split(' ').forEach(word=>{
+                    filteredUsers = users.filter(user=>{
+                        let userName = user.name.split('');
+                        return word.split('').map((char, i)=> {
+                            if(char.toLowerCase() !== userName[i]?.toLowerCase())
+                                return false;
+                        }).includes(false)?false:true;
+                    })
+                })
+                assignUsersToDOM(e, filteredUsers);
+            }
         if(user)
-            script(src='/socket.io/socket.io.js')
             script(src='/js/socket.init.js')
         
         block js

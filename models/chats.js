@@ -17,17 +17,18 @@ const Schema = new mongoose.Schema({
 const messages = new mongoose.model('message',Schema);
 
 export const createMessagesDoc =async (...usersIds)=>{
-    let exist = false;
+    // let exist = false;
     let messagesId ;
     try {
-        await messages.find().then(messages=>{
-            messages.forEach(obj => {
+        messagesId = await messages.find({ usersIds:{$all:[usersIds[0], usersIds[1]]} }, {_id:1}).then(messages=>
+            /* messages.forEach(obj => {
                 exist = obj.usersIds[0] === usersIds[0]? obj.usersIds[1] === usersIds[1]? true:false:
                 obj.usersIds[0] === usersIds[1]? obj.usersIds[1] === usersIds[0]? true:false:false;
                 if(exist)
                     messagesId = obj._id;
-            });
-        }).catch(()=>{
+            }); */
+            messages._id
+        ).catch(()=>{
             throw null;
         });
         if(messagesId) return messagesId;

@@ -115,7 +115,7 @@ const checkUser = (req, res, next) =>{
             res.redirect(301,'/login');
         }else {
             req.session.user = result;
-            res.redirect(301,'/profile/'+result._id);
+            req.session.save(()=>{res.redirect(301,'/profile/'+result._id);})
         }
     }).catch(()=>{
         next({status:'500'})
@@ -135,7 +135,7 @@ const removeNotificatons = (req, res)=>{
     if(req.session.user.notifications.length){
         deleteNotificatons(req.session.user._id).then(()=>{
             req.session.user.notifications = [];
-            res.sendStatus(200);
+            req.session.save(()=>{res.sendStatus(200)});
         }).catch(()=>{
             res.sendStatus(500);
         });

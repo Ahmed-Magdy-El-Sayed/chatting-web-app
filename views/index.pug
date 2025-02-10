@@ -2,8 +2,8 @@ extends ./main
 block variables
     -let pageTitle = 'Home'
 block content
-    .container.mt-5
-        if(user)
+    if(user)
+        .container.mt-5
             if(info.hisAccount)
                 .d-flex.gap-3
                     .left.w-25
@@ -93,6 +93,13 @@ block content
                                         button(class='btn btn-danger' id="reject_"+info.userProfile.userId value=info.userProfile ) Reject
                             else
                                 button(class='btn btn-primary' id="add-friend_"+info.userProfile.userId value=info.userProfile) Add Friend
-        else 
-            h3.alert.alert-warning create account or login if you have account
+    else 
+        .w-100.h-100.position-relative.overflow-hidden
+            img.w-100(style='object-fit:cover' src='/tech-inspired.png')
+            .position-absolute.top-0.start-0.w-100.h-100.bg-dark.opacity-50
+            img.w-50.position-absolute.end-0.me-5.mt-5.rounded-pill(style='object-fit:cover; max-width: 500px' src='/chat-bubbles.png')
+            .position-absolute.start-0.ms-5.p-2.text-white.m-auto.rounded(style="top: 25vh")
+                h1 Chatting Made Simple: 
+                p.ms-4 Your Go-To Platform for Effortless Communication
+                a.btn.btn-primary(href='/login') Get Started
 
